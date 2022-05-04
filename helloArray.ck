@@ -1,11 +1,15 @@
-// a saw oscillator chucked into an ADSR envelope
+// two sSaw scillator chucked into Gain
+// thne into an ADSR envelope
 // then into a LowPass filter
 // and then chucked into our dac
 
-SawOsc saw => ADSR env => LPF lowpass => Echo e=> dac;
+SawOsc saw => Gain g;
+SawOsc saw2 => g;
+g => ADSR env => LPF lowpass => Echo dly => dac;
 
 
-0.4 => saw.gain; // initial sawtooth wave gain
+0.3 => saw.gain; // initial sawtooth wave gain
+0.3 => saw2.gain; // initial sawtooth wave gain
 (2::samp, 180::ms, 0, 190::ms) => env.set; // envelope parameters
 1200 => lowpass.freq; // initial cutoff frequency
 2.5 => lowpass.Q; // initial reso
@@ -26,6 +30,7 @@ while (true)
     80 + ((index % 200)  * 10) => lowpass.freq;
     
     Std.mtof(notes[index%notes.size()]) => saw.freq;
+    (Std.mtof(notes[index%notes.size()]) + 7) => saw2.freq; //saw is slightly detuned
     1 => env.keyOn; // play the Envelope
     index + 1 => index; //advance the index
     <<< index % notes.size() >>> ;

@@ -1,7 +1,16 @@
 // a raw FM synth
 SinOsc carrier => Gain g;
 SinOsc modulator => blackhole;
+
+SndBuf ztick => dac;
+
 g => dac;
+
+// we read the file into the soundbuffer
+me.dir() + "/samples/ztick.aiff" => ztick.read;
+
+// just mute the gain
+0.0 => g.gain;
 0.5 => carrier.gain;
 
 // modulator index
@@ -68,7 +77,22 @@ while (true)
            Std.fabs(msg.getFloat(0)) * 800.0 + 20 => carrier.freq;
            /// <<< debug >>>;
        }
-
+       
+       // main buttonB
+       if (msg.address == "/buttonB")
+       {
+           if (msg.getFloat(0) == 1.0)
+           {
+           0 => ztick.pos;    
+           /// <<< debug >>>;
+           }
+       }
+       
+       // main pitch
+       if (msg.address == "/pitch")
+       {
+          Std.fabs(msg.getFloat(0)) * 2.0 => ztick.rate;
+       }
        
     }
 }
@@ -79,7 +103,7 @@ fun void modulation1()
 {
     while (true)
     {
-        modulator.last() 
+        // modulator.last() ;
         
     }
 }
